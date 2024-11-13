@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class User {
     
-    private int id;
+    private long id;
     private String firstname;
     private String lastname;
     private int age;
@@ -26,7 +26,7 @@ public class User {
         this.accounts = new ArrayList<>();
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
