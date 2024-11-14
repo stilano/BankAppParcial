@@ -11,20 +11,14 @@ package bank;
 public class Transaction {
     
     private TransactionType type;
-    private Account account1;
-    private Account account2;
+    private Account sourceAccount;
+    private Account destinationAccount;
     private double amount;
-
-    public Transaction(TransactionType type, Account account1, double amount) {
+    
+    public Transaction(TransactionType type, Account sourceAccount, Account destinationAccount, double amount) {
         this.type = type;
-        this.account1 = account1;
-        this.amount = amount;
-    }
-
-    public Transaction(TransactionType type, Account account1, Account account2, double amount) {
-        this.type = type;
-        this.account1 = account1;
-        this.account2 = account2;
+        this.sourceAccount = sourceAccount;
+        this.destinationAccount = destinationAccount;
         this.amount = amount;
     }
 
@@ -32,12 +26,12 @@ public class Transaction {
         return type;
     }
 
-    public Account getAccount1() {
-        return account1;
+    public Account getSourceAccount() {
+        return sourceAccount;
     }
 
-    public Account getAccount2() {
-        return account2;
+    public Account getDestinationAccount() {
+        return destinationAccount;
     }
 
     public double getAmount() {

@@ -21,7 +21,15 @@ public class Account {
         
         this.owner.addAccount(this);
     }
-
+    
+    public Account(String id, User owner, double balance) {
+        this.id = id;
+        this.owner = owner;
+        this.balance = balance;
+        
+        this.owner.addAccount(this);
+    }
+    
     public String getId() {
         return id;
     }

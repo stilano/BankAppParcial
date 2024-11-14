@@ -4,17 +4,30 @@
  */
 package bank;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author edangulo
  */
 public class BankFrame extends javax.swing.JFrame {
-
+    
+    private ArrayList<Account> accounts;
+    private ArrayList<Transaction> transactions;
+    private ArrayList<User> users;
+    
     /**
      * Creates new form BankFrame
      */
     public BankFrame() {
         initComponents();
+        this.accounts = new ArrayList<>();
+        this.transactions = new ArrayList<>();
+        this.users = new ArrayList<>();
     }
 
     /**
@@ -91,6 +104,11 @@ public class BankFrame extends javax.swing.JFrame {
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
         jButton1.setText("Register");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -160,6 +178,11 @@ public class BankFrame extends javax.swing.JFrame {
 
         jButton2.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
         jButton2.setText("Create");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -226,6 +249,11 @@ public class BankFrame extends javax.swing.JFrame {
 
         jButton3.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
         jButton3.setText("Execute");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -309,6 +337,11 @@ public class BankFrame extends javax.swing.JFrame {
 
         jButton4.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
         jButton4.setText("Refresh");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -367,6 +400,11 @@ public class BankFrame extends javax.swing.JFrame {
 
         jButton5.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
         jButton5.setText("Refresh");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -430,6 +468,11 @@ public class BankFrame extends javax.swing.JFrame {
 
         jButton6.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
         jButton6.setText("Refresh");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -473,6 +516,178 @@ public class BankFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        try {
+            int id = Integer.parseInt(jTextField1.getText());
+            String firstname = jTextField2.getText();
+            String lastname = jTextField3.getText();
+            int age = Integer.parseInt(jTextField4.getText());
+            
+            this.users.add(new User(id, firstname, lastname, age));
+            
+            jTextField1.setText("");
+            jTextField2.setText("");
+            jTextField3.setText("");
+            jTextField4.setText("");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        try {
+            int userId = Integer.parseInt(jTextField5.getText());
+            double initialBalance = Double.parseDouble(jTextField6.getText());
+            
+            User selectedUser = null;
+            for (User user : this.users) {
+                if (user.getId() == userId && selectedUser == null) {
+                    selectedUser = user;
+                }
+            }
+            
+            if (selectedUser != null) {
+                Random random = new Random();
+                int first = random.nextInt(1000);
+                int second = random.nextInt(1000000);
+                int third = random.nextInt(100);
+                
+                String accountId = String.format("%03d", first) + "-" + String.format("%06d", second) + "-" + String.format("%02d", third);
+                
+                this.accounts.add(new Account(accountId, selectedUser, initialBalance));
+                
+                jTextField5.setText("");
+                jTextField6.setText("");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        try {
+            String type = jComboBox1.getItemAt(jComboBox1.getSelectedIndex());
+            switch (type) {
+                case "Deposit": {
+                    String destinationAccountId = jTextField8.getText();
+                    double amount = Double.parseDouble(jTextField9.getText());
+                    
+                    Account destinationAccount = null;
+                    for (Account account : this.accounts) {
+                        if (account.getId().equals(destinationAccountId)) {
+                            destinationAccount = account;
+                        }
+                    }
+                    if (destinationAccount != null) {
+                        destinationAccount.deposit(amount);
+                        
+                        this.transactions.add(new Transaction(TransactionType.DEPOSIT, null, destinationAccount, amount));
+                        
+                        jTextField7.setText("");
+                        jTextField8.setText("");
+                        jTextField9.setText("");
+                    }
+                    break;
+                }
+                case "Withdraw": {
+                    String sourceAccountId = jTextField7.getText();
+                    double amount = Double.parseDouble(jTextField9.getText());
+                    
+                    Account sourceAccount = null;
+                    for (Account account : this.accounts) {
+                        if (account.getId().equals(sourceAccountId)) {
+                            sourceAccount = account;
+                        }
+                    }
+                    if (sourceAccount != null && sourceAccount.withdraw(amount)) {
+                        this.transactions.add(new Transaction(TransactionType.WITHDRAW, sourceAccount, null, amount));
+                        
+                        jTextField7.setText("");
+                        jTextField8.setText("");
+                        jTextField9.setText("");
+                    }
+                    break;
+                }
+                case "Transfer": {
+                    String sourceAccountId = jTextField7.getText();
+                    String destinationAccountId = jTextField8.getText();
+                    double amount = Double.parseDouble(jTextField9.getText());
+                    
+                    Account sourceAccount = null;
+                    Account destinationAccount = null;
+                    for (Account account : this.accounts) {
+                        if (account.getId().equals(sourceAccountId)) {
+                            sourceAccount = account;
+                        }
+                    }
+                    for (Account account : this.accounts) {
+                        if (account.getId().equals(destinationAccountId)) {
+                            destinationAccount = account;
+                        }
+                    }
+                    if (sourceAccount != null && destinationAccount != null && sourceAccount.withdraw(amount)) {
+                        destinationAccount.deposit(amount);
+                        
+                        this.transactions.add(new Transaction(TransactionType.TRANSFER, sourceAccount, destinationAccount, amount));
+                        
+                        jTextField7.setText("");
+                        jTextField8.setText("");
+                        jTextField9.setText("");
+                    }
+                    break;
+                }
+                default: {
+                    jTextField7.setText("");
+                    jTextField8.setText("");
+                    jTextField9.setText("");
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+        
+        this.users.sort((obj1, obj2) -> (obj1.getId() - obj2.getId()));
+        
+        for (User user : this.users) {
+            model.addRow(new Object[]{user.getId(), user.getFirstname() + " " + user.getLastname(), user.getAge(), user.getNumAccounts()});
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        model.setRowCount(0);
+        
+        this.accounts.sort((obj1, obj2) -> (obj1.getId().compareTo(obj2.getId())));
+        
+        for (Account account : this.accounts) {
+            model.addRow(new Object[]{account.getId(), account.getOwner().getId(), account.getBalance()});
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
+        model.setRowCount(0);
+        
+        ArrayList<Transaction> transactionsCopy = (ArrayList<Transaction>) this.transactions.clone();
+        Collections.reverse(transactionsCopy);
+        
+        for (Transaction transaction : transactionsCopy) {
+            model.addRow(new Object[]{transaction.getType().name(), (transaction.getSourceAccount() != null ? transaction.getSourceAccount().getId() : "None"), (transaction.getDestinationAccount()!= null ? transaction.getDestinationAccount().getId() : "None"), transaction.getAmount()});
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * @param args the command line arguments
