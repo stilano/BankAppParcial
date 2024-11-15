@@ -4,6 +4,8 @@
  */
 package bank;
 
+import core.models.User;
+
 /**
  *
  * @author edangulo
