@@ -4,7 +4,6 @@
  */
 package core.models;
 
-import bank.Account;
 import java.util.ArrayList;
 
 /**

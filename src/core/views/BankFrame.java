@@ -4,10 +4,15 @@
  */
 package core.views;
 
-import bank.Account;
-import bank.Transaction;
-import bank.TransactionType;
+import core.controllers.AccountController;
+import core.controllers.TransactionController;
+import core.controllers.UserController;
+import core.controllers.utilities.Response;
+import core.models.Account;
+import core.models.transactions.Transaction;
+import core.models.transactions.TransactionType;
 import core.models.User;
+import core.models.storage.AccountStorage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -19,11 +24,11 @@ import javax.swing.table.DefaultTableModel;
  * @author edangulo
  */
 public class BankFrame extends javax.swing.JFrame {
-    
+
     private ArrayList<Account> accounts;
     private ArrayList<Transaction> transactions;
     private ArrayList<User> users;
-    
+
     /**
      * Creates new form BankFrame
      */
@@ -519,178 +524,108 @@ public class BankFrame extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void registerUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerUserButtonActionPerformed
         // TODO add your handling code here:
-        try {
-            int id = Integer.parseInt(registerIDTextField.getText());
-            String firstname = registerfirstnameTextField.getText();
-            String lastname = registerlastnameTextField.getText();
-            int age = Integer.parseInt(registerageTextField.getText());
-            
-            this.users.add(new User(id, firstname, lastname, age));
-            
+        String id = registerIDTextField.getText();
+        String firstname = registerfirstnameTextField.getText();
+        String lastname = registerlastnameTextField.getText();
+        String age = registerageTextField.getText();
+
+        Response response = UserController.registerUser(id, firstname, lastname, age, age);
+
+        if (response.getStatus() >= 500) {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Error " + response.getStatus(), JOptionPane.ERROR_MESSAGE);
+        } else if (response.getStatus() >= 400) {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Error " + response.getStatus(), JOptionPane.WARNING_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Response Message", JOptionPane.INFORMATION_MESSAGE);
+
             registerIDTextField.setText("");
             registerfirstnameTextField.setText("");
             registerlastnameTextField.setText("");
             registerageTextField.setText("");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_registerUserButtonActionPerformed
 
     private void createAccountButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createAccountButtonActionPerformed
         // TODO add your handling code here:
-        try {
-            int userId = Integer.parseInt(accountIDTextField.getText());
-            double initialBalance = Double.parseDouble(initialbalanceTextField.getText());
-            
-            User selectedUser = null;
-            for (User user : this.users) {
-                if (user.getId() == userId && selectedUser == null) {
-                    selectedUser = user;
-                }
-            }
-            
-            if (selectedUser != null) {
-                Random random = new Random();
-                int first = random.nextInt(1000);
-                int second = random.nextInt(1000000);
-                int third = random.nextInt(100);
-                
-                String accountId = String.format("%03d", first) + "-" + String.format("%06d", second) + "-" + String.format("%02d", third);
-                
-                this.accounts.add(new Account(accountId, selectedUser, initialBalance));
-                
-                accountIDTextField.setText("");
-                initialbalanceTextField.setText("");
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
+        String userIdText = accountIDTextField.getText();
+        String initialBalanceText = initialbalanceTextField.getText();
+
+        Response response = AccountController.createAccount(userIdText, initialBalanceText);
+
+        if (response.getStatus() >= 500) {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Error " + response.getStatus(), JOptionPane.ERROR_MESSAGE);
+        } else if (response.getStatus() >= 400) {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Error " + response.getStatus(), JOptionPane.WARNING_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Response Message", JOptionPane.INFORMATION_MESSAGE);
+
+            accountIDTextField.setText("");
+            initialbalanceTextField.setText("");
         }
     }//GEN-LAST:event_createAccountButtonActionPerformed
 
     private void executeTransactionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeTransactionButtonActionPerformed
         // TODO add your handling code here:
-        try {
-            String type = transactiontypeComboBox.getItemAt(transactiontypeComboBox.getSelectedIndex());
-            switch (type) {
-                case "Deposit": {
-                    String destinationAccountId = destinationaccountTextField.getText();
-                    double amount = Double.parseDouble(transactionamountTextField.getText());
-                    
-                    Account destinationAccount = null;
-                    for (Account account : this.accounts) {
-                        if (account.getId().equals(destinationAccountId)) {
-                            destinationAccount = account;
-                        }
-                    }
-                    if (destinationAccount != null) {
-                        destinationAccount.deposit(amount);
-                        
-                        this.transactions.add(new Transaction(TransactionType.DEPOSIT, null, destinationAccount, amount));
-                        
-                        sourceaccountTextField.setText("");
-                        destinationaccountTextField.setText("");
-                        transactionamountTextField.setText("");
-                    }
-                    break;
-                }
-                case "Withdraw": {
-                    String sourceAccountId = sourceaccountTextField.getText();
-                    double amount = Double.parseDouble(transactionamountTextField.getText());
-                    
-                    Account sourceAccount = null;
-                    for (Account account : this.accounts) {
-                        if (account.getId().equals(sourceAccountId)) {
-                            sourceAccount = account;
-                        }
-                    }
-                    if (sourceAccount != null && sourceAccount.withdraw(amount)) {
-                        this.transactions.add(new Transaction(TransactionType.WITHDRAW, sourceAccount, null, amount));
-                        
-                        sourceaccountTextField.setText("");
-                        destinationaccountTextField.setText("");
-                        transactionamountTextField.setText("");
-                    }
-                    break;
-                }
-                case "Transfer": {
-                    String sourceAccountId = sourceaccountTextField.getText();
-                    String destinationAccountId = destinationaccountTextField.getText();
-                    double amount = Double.parseDouble(transactionamountTextField.getText());
-                    
-                    Account sourceAccount = null;
-                    Account destinationAccount = null;
-                    for (Account account : this.accounts) {
-                        if (account.getId().equals(sourceAccountId)) {
-                            sourceAccount = account;
-                        }
-                    }
-                    for (Account account : this.accounts) {
-                        if (account.getId().equals(destinationAccountId)) {
-                            destinationAccount = account;
-                        }
-                    }
-                    if (sourceAccount != null && destinationAccount != null && sourceAccount.withdraw(amount)) {
-                        destinationAccount.deposit(amount);
-                        
-                        this.transactions.add(new Transaction(TransactionType.TRANSFER, sourceAccount, destinationAccount, amount));
-                        
-                        sourceaccountTextField.setText("");
-                        destinationaccountTextField.setText("");
-                        transactionamountTextField.setText("");
-                    }
-                    break;
-                }
-                default: {
-                    sourceaccountTextField.setText("");
-                    destinationaccountTextField.setText("");
-                    transactionamountTextField.setText("");
-                    break;
-                }
-            }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
+        String type = transactiontypeComboBox.getItemAt(transactiontypeComboBox.getSelectedIndex());
+        String sourceAccountId = sourceaccountTextField.getText();
+        String destinationAccountId = destinationaccountTextField.getText();
+        double amount = Double.parseDouble(transactionamountTextField.getText());
+        
+        Response response = TransactionController.registerTransaction(type, sourceAccountId, destinationAccountId, String.valueOf(amount));
+        
+        if (response.getStatus() >= 500) {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Error " + response.getStatus(), JOptionPane.ERROR_MESSAGE);
+        } else if (response.getStatus() >= 400) {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Error " + response.getStatus(), JOptionPane.WARNING_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, response.getMessage(), "Transaction Completed", JOptionPane.INFORMATION_MESSAGE);
         }
+
+        sourceaccountTextField.setText("");
+        destinationaccountTextField.setText("");
+        transactionamountTextField.setText("");
     }//GEN-LAST:event_executeTransactionButtonActionPerformed
 
     private void refreshUserListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshUserListButtonActionPerformed
-        // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel) usersListTable.getModel();
-        model.setRowCount(0);
-        
-        this.users.sort((obj1, obj2) -> (obj1.getId() - obj2.getId()));
-        
-        for (User user : this.users) {
-            model.addRow(new Object[]{user.getId(), user.getFirstname() + " " + user.getLastname(), user.getAge(), user.getNumAccounts()});
-        }
+//        // TODO add your handling code here:
+//        DefaultTableModel model = (DefaultTableModel) usersListTable.getModel();
+//        model.setRowCount(0);
+//
+//        this.users.sort((obj1, obj2) -> (obj1.getId() - obj2.getId()));
+//
+//        for (User user : this.users) {
+//            model.addRow(new Object[]{user.getId(), user.getFirstname() + " " + user.getLastname(), user.getAge(), user.getNumAccounts()});
+//        }
     }//GEN-LAST:event_refreshUserListButtonActionPerformed
 
     private void refreshAccountListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshAccountListButtonActionPerformed
-        // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel) accountsListTable.getModel();
-        model.setRowCount(0);
-        
-        this.accounts.sort((obj1, obj2) -> (obj1.getId().compareTo(obj2.getId())));
-        
-        for (Account account : this.accounts) {
-            model.addRow(new Object[]{account.getId(), account.getOwner().getId(), account.getBalance()});
-        }
+//        // TODO add your handling code here:
+//        DefaultTableModel model = (DefaultTableModel) accountsListTable.getModel();
+//        model.setRowCount(0);
+//
+//        this.accounts.sort((obj1, obj2) -> (obj1.getId().compareTo(obj2.getId())));
+//
+//        for (Account account : this.accounts) {
+//            model.addRow(new Object[]{account.getId(), account.getOwner().getId(), account.getBalance()});
+//        }
     }//GEN-LAST:event_refreshAccountListButtonActionPerformed
 
     private void refreshTransactionListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTransactionListButtonActionPerformed
-        // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel) transactionsListTable.getModel();
-        model.setRowCount(0);
-        
-        ArrayList<Transaction> transactionsCopy = (ArrayList<Transaction>) this.transactions.clone();
-        Collections.reverse(transactionsCopy);
-        
-        for (Transaction transaction : transactionsCopy) {
-            model.addRow(new Object[]{transaction.getType().name(), (transaction.getSourceAccount() != null ? transaction.getSourceAccount().getId() : "None"), (transaction.getDestinationAccount()!= null ? transaction.getDestinationAccount().getId() : "None"), transaction.getAmount()});
-        }
+//        // TODO add your handling code here:
+//        DefaultTableModel model = (DefaultTableModel) transactionsListTable.getModel();
+//        model.setRowCount(0);
+//
+//        ArrayList<Transaction> transactionsCopy = (ArrayList<Transaction>) this.transactions.clone();
+//        Collections.reverse(transactionsCopy);
+//
+//        for (Transaction transaction : transactionsCopy) {
+//            model.addRow(new Object[]{transaction.getType().name(), (transaction.getSourceAccount() != null ? transaction.getSourceAccount().getId() : "None"), (transaction.getDestinationAccount() != null ? transaction.getDestinationAccount().getId() : "None"), transaction.getAmount()});
+//        }
     }//GEN-LAST:event_refreshTransactionListButtonActionPerformed
 
     /**

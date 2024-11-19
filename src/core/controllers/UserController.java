@@ -4,50 +4,60 @@
  */
 package core.controllers;
 
+import core.controllers.utilities.Response;
+import core.controllers.utilities.Status;
 import core.models.User;
-import core.models.userstorage.UserStorage;
+import core.models.storage.UserStorage;
 
 /**
  *
  * @author tilan
  */
 public class UserController {
-    public static String createUser(String id, String firstname, String lastname, String age, String gender) {
+
+    public static Response registerUser(String id, String firstname, String lastname, String age, String gender) {
         try {
-            int idInt, ageInt = 0;
+            int idInt, ageInt;
+
             try {
                 idInt = Integer.parseInt(id);
                 if (idInt < 0) {
-                    return "Id must be positive";
+                    return new Response("Id must be positive", Status.BAD_REQUEST);
+                }
+                if (String.valueOf(idInt).length() > 9) {
+                    return new Response("Id must not pass 9 digits", Status.BAD_REQUEST);
                 }
             } catch (NumberFormatException ex) {
-                return "Id must be numeric";
+                return new Response("Id must be numeric", Status.BAD_REQUEST);
             }
             
             if (firstname.equals("")) {
-               return "First Name must not be empty";
+                return new Response("Firstname must be not empty", Status.BAD_REQUEST);
             }
             
             if (lastname.equals("")) {
-                System.out.println("Last Name must not be empty");
+                return new Response("Lastname must be not empty", Status.BAD_REQUEST);
             }
             
             try {
                 ageInt = Integer.parseInt(age);
                 if (ageInt < 0) {
-                    System.out.println("Age must be positive");
+                    return new Response("Age must be positive", Status.BAD_REQUEST);
+                }
+                if (ageInt < 18) {
+                    return new Response("Age must be 18+", Status.BAD_REQUEST);
                 }
             } catch (NumberFormatException ex) {
-                System.out.println("Age must be numeric");
+                return new Response("Age must be numeric", Status.BAD_REQUEST);
             }
-            
-            UserStorage storage = UserStorage.getInstance();            
+
+            UserStorage storage = UserStorage.getInstance();
             if (!storage.addUser(new User(idInt, firstname, lastname, ageInt))) {
-                System.out.println("A person with that id already exists");
+                return new Response("A person with that id already exists", Status.BAD_REQUEST);
             }
-            return "User created successfully";
+            return new Response("Person created successfully", Status.CREATED);
         } catch (Exception ex) {
-            return "Unexpected error";
+            return new Response("Unexpected error", Status.INTERNAL_SERVER_ERROR);
         }
     }
 }
