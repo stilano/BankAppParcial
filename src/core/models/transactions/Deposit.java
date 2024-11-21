@@ -15,10 +15,15 @@ public class Deposit implements TransactionType {
     @Override
     public void execute(Account source, Account destination, double amount) {
         if (destination != null) {
-            destination.deposit(amount); // Realiza el depósito en la cuenta de destino
-        } else {
-            throw new IllegalArgumentException("Cuenta de destino no válida");
+            destination.deposit(amount);
         }
     }
+
+    @Override
+    public String name() {
+        return "Deposit";
+    }
+    
+    
 }
 

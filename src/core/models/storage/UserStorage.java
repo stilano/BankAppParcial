@@ -45,4 +45,8 @@ public class UserStorage {
         }
         return null;
     }
+    
+    public ArrayList<User> getAllUsers() {
+        return new ArrayList<>(this.users);
+    }
 }

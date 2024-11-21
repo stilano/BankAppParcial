@@ -36,4 +36,8 @@ public class TransactionStorage {
         transactions.add(transaction);
         return true;
     }
+    
+    public ArrayList<Transaction> getAllTransactions() {
+        return new ArrayList<>(this.transactions);
+    }
 }

@@ -10,12 +10,8 @@ import core.controllers.UserController;
 import core.controllers.utilities.Response;
 import core.models.Account;
 import core.models.transactions.Transaction;
-import core.models.transactions.TransactionType;
 import core.models.User;
-import core.models.storage.AccountStorage;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,18 +21,12 @@ import javax.swing.table.DefaultTableModel;
  */
 public class BankFrame extends javax.swing.JFrame {
 
-    private ArrayList<Account> accounts;
-    private ArrayList<Transaction> transactions;
-    private ArrayList<User> users;
-
     /**
      * Creates new form BankFrame
      */
     public BankFrame() {
         initComponents();
-        this.accounts = new ArrayList<>();
-        this.transactions = new ArrayList<>();
-        this.users = new ArrayList<>();
+
     }
 
     /**
@@ -575,9 +565,9 @@ public class BankFrame extends javax.swing.JFrame {
         String sourceAccountId = sourceaccountTextField.getText();
         String destinationAccountId = destinationaccountTextField.getText();
         double amount = Double.parseDouble(transactionamountTextField.getText());
-        
+
         Response response = TransactionController.registerTransaction(type, sourceAccountId, destinationAccountId, String.valueOf(amount));
-        
+
         if (response.getStatus() >= 500) {
             JOptionPane.showMessageDialog(null, response.getMessage(), "Error " + response.getStatus(), JOptionPane.ERROR_MESSAGE);
         } else if (response.getStatus() >= 400) {
@@ -592,40 +582,63 @@ public class BankFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_executeTransactionButtonActionPerformed
 
     private void refreshUserListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshUserListButtonActionPerformed
-//        // TODO add your handling code here:
-//        DefaultTableModel model = (DefaultTableModel) usersListTable.getModel();
-//        model.setRowCount(0);
-//
-//        this.users.sort((obj1, obj2) -> (obj1.getId() - obj2.getId()));
-//
-//        for (User user : this.users) {
-//            model.addRow(new Object[]{user.getId(), user.getFirstname() + " " + user.getLastname(), user.getAge(), user.getNumAccounts()});
-//        }
+        // TODO add your handling code here:
+        Response response = UserController.getUsers();
+
+        if (response.getStatus() == 200) {
+            ArrayList<User> users = (ArrayList<User>) response.getObject();
+            DefaultTableModel tableModel = (DefaultTableModel) usersListTable.getModel();
+
+            tableModel.setRowCount(0);
+
+            for (User user : users) {
+                tableModel.addRow(new Object[]{user.getId(), user.getFirstname() + " " + user.getLastname(), user.getAge(), user.getNumAccounts()});
+            }
+
+            JOptionPane.showMessageDialog(this, response.getMessage(), "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, response.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_refreshUserListButtonActionPerformed
 
     private void refreshAccountListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshAccountListButtonActionPerformed
-//        // TODO add your handling code here:
-//        DefaultTableModel model = (DefaultTableModel) accountsListTable.getModel();
-//        model.setRowCount(0);
-//
-//        this.accounts.sort((obj1, obj2) -> (obj1.getId().compareTo(obj2.getId())));
-//
-//        for (Account account : this.accounts) {
-//            model.addRow(new Object[]{account.getId(), account.getOwner().getId(), account.getBalance()});
-//        }
+        // TODO add your handling code here:
+        Response response = AccountController.getAccounts();
+
+        if (response.getStatus() == 200) {
+            ArrayList<Account> accounts = (ArrayList<Account>) response.getObject();
+            DefaultTableModel tableModel = (DefaultTableModel) accountsListTable.getModel();
+
+            tableModel.setRowCount(0);
+
+            for (Account account : accounts) {
+                tableModel.addRow(new Object[]{account.getId(), account.getOwner().getId(), account.getBalance()});
+            }
+
+            JOptionPane.showMessageDialog(this, response.getMessage(), "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, response.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_refreshAccountListButtonActionPerformed
 
     private void refreshTransactionListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTransactionListButtonActionPerformed
-//        // TODO add your handling code here:
-//        DefaultTableModel model = (DefaultTableModel) transactionsListTable.getModel();
-//        model.setRowCount(0);
-//
-//        ArrayList<Transaction> transactionsCopy = (ArrayList<Transaction>) this.transactions.clone();
-//        Collections.reverse(transactionsCopy);
-//
-//        for (Transaction transaction : transactionsCopy) {
-//            model.addRow(new Object[]{transaction.getType().name(), (transaction.getSourceAccount() != null ? transaction.getSourceAccount().getId() : "None"), (transaction.getDestinationAccount() != null ? transaction.getDestinationAccount().getId() : "None"), transaction.getAmount()});
-//        }
+        // TODO add your handling code here:
+        Response response = TransactionController.getTransactions();
+
+        if (response.getStatus() == 200) {
+            ArrayList<Transaction> transactions = (ArrayList<Transaction>) response.getObject();
+            DefaultTableModel tableModel = (DefaultTableModel) transactionsListTable.getModel();
+
+            tableModel.setRowCount(0);
+
+            for (Transaction transaction : transactions) {
+                tableModel.addRow(new Object[]{transaction.getType().name(), (transaction.getSourceAccount() != null ? transaction.getSourceAccount().getId() : "None"), (transaction.getDestinationAccount() != null ? transaction.getDestinationAccount().getId() : "None"), transaction.getAmount()});
+            }
+
+            JOptionPane.showMessageDialog(this, response.getMessage(), "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, response.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_refreshTransactionListButtonActionPerformed
 
     /**
@@ -653,14 +666,7 @@ public class BankFrame extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(BankFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new BankFrame().setVisible(true);
-            }
-        });
+        //</editor-fold>        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

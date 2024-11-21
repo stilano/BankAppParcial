@@ -5,7 +5,6 @@
 package core.models.transactions;
 
 import core.models.Account;
-import core.models.transactions.TransactionType;
 
 /**
  *

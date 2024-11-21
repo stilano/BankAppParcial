@@ -4,8 +4,6 @@
  */
 package core.models;
 
-import core.models.User;
-
 /**
  *
  * @author edangulo

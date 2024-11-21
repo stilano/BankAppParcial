@@ -15,9 +15,13 @@ public class Withdraw implements TransactionType {
     @Override
     public void execute(Account source, Account destination, double amount) {
         if (source != null && source.withdraw(amount)) {
-        } else {
-            throw new IllegalArgumentException("Saldo insuficiente o cuenta no válida");
         }
     }
+    
+    @Override
+    public String name() {
+        return "Withdraw";
+    }
+    
 }
 

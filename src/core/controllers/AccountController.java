@@ -10,6 +10,7 @@ import core.models.Account;
 import core.models.User;
 import core.models.storage.AccountStorage;
 import core.models.storage.UserStorage;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -51,6 +52,21 @@ public class AccountController {
             return new Response("Invalid input format for user ID or balance", Status.BAD_REQUEST);
         } catch (Exception ex) {
             return new Response("Unexpected error occurred", Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    public static Response getAccounts() {
+        try {
+            AccountStorage storage = AccountStorage.getInstance();
+            ArrayList<Account> accounts = storage.getAllAccounts();
+
+            if (accounts.isEmpty()) {
+                return new Response("No accounts found", Status.NOT_FOUND);
+            }
+            
+            return new Response("Got all accounts", Status.OK, accounts);
+        } catch (Exception ex) {
+            return new Response("Unexpected error while fetching accounts", Status.INTERNAL_SERVER_ERROR);
         }
     }
 }

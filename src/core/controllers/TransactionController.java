@@ -10,11 +10,8 @@ import core.models.Account;
 import core.controllers.handlers.TransactionHandler;
 import core.models.storage.AccountStorage;
 import core.models.storage.TransactionStorage;
-import core.models.transactions.Deposit;
 import core.models.transactions.Transaction;
-import core.models.transactions.TransactionType;
-import core.models.transactions.Transfer;
-import core.models.transactions.Withdraw;
+import java.util.ArrayList;
 
 /**
  *
@@ -40,37 +37,26 @@ public class TransactionController {
             Account sourceAccount = accountStorage.getAccount(sourceAccountId);
             Account destinationAccount = accountStorage.getAccount(destinationAccountId);
 
-            if (sourceAccount == null) {
-                return new Response("Source account does not exist", Status.BAD_REQUEST);
-            }
+            TransactionHandler transactionHandler = new TransactionHandler();
+            return transactionHandler.processTransaction(transactionType, sourceAccount, destinationAccount, amountDouble);
 
-            if (transactionType.equals("TRANSFER") || transactionType.equals("DEPOSIT")) {
-                if (destinationAccount == null) {
-                    return new Response("Destination account does not exist", Status.BAD_REQUEST);
-                }
-            }
-
-            TransactionType transaction = null;
-            if (transactionType.equals("Deposit")) {
-                transaction = new Deposit();
-            } else if (transactionType.equals("Withdraw")) {
-                transaction = new Withdraw();
-            } else if (transactionType.equals("Transfer")) {
-                transaction = new Transfer();
-            } else {
-                return new Response("Invalid transaction type", Status.BAD_REQUEST);
-            }
-
-            try {
-                TransactionHandler transactionHandler = new TransactionHandler();
-                transactionHandler.processTransaction(transaction, sourceAccount, destinationAccount, amountDouble);
-            } catch (IllegalArgumentException ex) {
-                return new Response("Insuficient balance", Status.BAD_REQUEST);
-            }
-
-            return new Response("Transaction processed successfully", Status.CREATED);
         } catch (Exception ex) {
             return new Response("Unexpected error", Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public static Response getTransactions() {
+        try {
+            TransactionStorage storage = TransactionStorage.getInstance();
+            ArrayList<Transaction> transactions = storage.getAllTransactions();
+
+            if (transactions.isEmpty()) {
+                return new Response("No transactions found", Status.NOT_FOUND);
+            }
+
+            return new Response("Got all transactions", Status.OK, transactions);
+        } catch (Exception ex) {
+            return new Response("Unexpected error while fetching transactions", Status.INTERNAL_SERVER_ERROR);
         }
     }
 }

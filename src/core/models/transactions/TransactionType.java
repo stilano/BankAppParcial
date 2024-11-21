@@ -12,5 +12,6 @@ import core.models.Account;
  */
 public interface TransactionType {
     public abstract void execute(Account source, Account destination, double amount);
+    String name();
 }
 

@@ -15,9 +15,12 @@ public class Transfer implements TransactionType {
     @Override
     public void execute(Account source, Account destination, double amount) {
         if (source != null && destination != null && source.withdraw(amount)) {
-            destination.deposit(amount); // Realiza el depósito en la cuenta destino
-        } else {
-            throw new IllegalArgumentException(", verifique las cuentas y el saldo");
+            destination.deposit(amount);
         }
+    }
+    
+    @Override
+    public String name() {
+        return "Transfer";
     }
 }

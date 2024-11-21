@@ -35,7 +35,7 @@ public class AccountStorage {
         this.accounts.add(account);
         return true;
     }
-
+    
     public Account getAccount(String id) {
         for (Account account : this.accounts) {
             if (account.getId().equals(id)) {
@@ -43,5 +43,9 @@ public class AccountStorage {
             }
         }
         return null;
+    }
+    
+    public ArrayList<Account> getAllAccounts() {
+        return new ArrayList<>(this.accounts);
     }
 }
