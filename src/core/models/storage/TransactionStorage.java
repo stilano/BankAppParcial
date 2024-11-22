@@ -6,6 +6,7 @@ package core.models.storage;
 
 import core.models.transactions.Transaction;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
@@ -38,6 +39,8 @@ public class TransactionStorage {
     }
     
     public ArrayList<Transaction> getAllTransactions() {
-        return new ArrayList<>(this.transactions);
+        ArrayList<Transaction> transactionsCopy = (ArrayList<Transaction>) this.transactions.clone();
+        Collections.reverse(transactionsCopy);
+        return transactionsCopy;
     }
 }

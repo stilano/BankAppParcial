@@ -47,6 +47,7 @@ public class UserStorage {
     }
     
     public ArrayList<User> getAllUsers() {
+        this.users.sort((u1, u2) -> Integer.compare(u1.getId(), u2.getId()));
         return new ArrayList<>(this.users);
     }
 }
