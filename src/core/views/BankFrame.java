@@ -8,7 +8,7 @@ import core.controllers.AccountController;
 import core.controllers.TransactionController;
 import core.controllers.UserController;
 import core.controllers.utilities.Response;
-import core.models.transactions.Transaction;
+import core.models.Transaction;
 import core.models.Account;
 import core.models.User;
 import java.util.ArrayList;
@@ -624,7 +624,7 @@ public class BankFrame extends javax.swing.JFrame {
     private void refreshTransactionListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshTransactionListButtonActionPerformed
         // TODO add your handling code here:
         Response response = TransactionController.getTransactions();
-
+        
         if (response.getStatus() == 200) {
             ArrayList<Transaction> transactions = (ArrayList<Transaction>) response.getObject();
             DefaultTableModel tableModel = (DefaultTableModel) transactionsListTable.getModel();

@@ -10,7 +10,7 @@ import core.models.Account;
  *
  * @author edangulo
  */
-public interface TransactionType {
+public abstract interface TransactionType {
     public abstract void execute(Account source, Account destination, double amount);
     String name();
 }

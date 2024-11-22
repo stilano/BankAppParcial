@@ -14,7 +14,7 @@ import java.util.ArrayList;
  *
  * @author tilan
  */
-public class UserController {
+public abstract class UserController {
 
     public static Response registerUser(String id, String firstname, String lastname, String age, String gender) {
         try {
@@ -76,5 +76,4 @@ public class UserController {
             return new Response("Unexpected error while fetching users", Status.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

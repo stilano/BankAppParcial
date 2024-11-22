@@ -6,26 +6,28 @@ package core.models.storage;
 
 import core.models.Account;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  *
  * @author tilan
  */
 public class AccountStorage {
+
     private static AccountStorage instance;
     private ArrayList<Account> accounts;
-    
+
     private AccountStorage() {
         this.accounts = new ArrayList<>();
     }
-    
+
     public static AccountStorage getInstance() {
         if (instance == null) {
             instance = new AccountStorage();
         }
         return instance;
     }
-    
+
     public boolean addAccount(Account account) {
         for (Account a : this.accounts) {
             if (a.getId() == account.getId()) {
@@ -35,7 +37,7 @@ public class AccountStorage {
         this.accounts.add(account);
         return true;
     }
-    
+
     public Account getAccount(String id) {
         for (Account account : this.accounts) {
             if (account.getId().equals(id)) {
@@ -44,9 +46,9 @@ public class AccountStorage {
         }
         return null;
     }
-    
+
     public ArrayList<Account> getAllAccounts() {
-        this.accounts.sort((a1, a2) -> (a1.getId().compareTo(a2.getId())));
+        accounts.sort((a1, a2) -> (a1.getId().compareTo(a2.getId())));
         return new ArrayList<>(this.accounts);
     }
 }

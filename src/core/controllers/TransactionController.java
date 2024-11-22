@@ -10,14 +10,14 @@ import core.models.Account;
 import core.controllers.handlers.TransactionHandler;
 import core.models.storage.AccountStorage;
 import core.models.storage.TransactionStorage;
-import core.models.transactions.Transaction;
+import core.models.Transaction;
 import java.util.ArrayList;
 
 /**
  *
  * @author tilan
  */
-public class TransactionController {
+public abstract class TransactionController {
 
     public static Response registerTransaction(String transactionType, String sourceAccountId, String destinationAccountId, String amount) {
         try {
@@ -31,29 +31,28 @@ public class TransactionController {
             } catch (NumberFormatException ex) {
                 return new Response("Amount must be numeric", Status.BAD_REQUEST);
             }
-
-            // Obtener las cuentas
+            
             AccountStorage accountStorage = AccountStorage.getInstance();
             Account sourceAccount = accountStorage.getAccount(sourceAccountId);
             Account destinationAccount = accountStorage.getAccount(destinationAccountId);
-
+            
             TransactionHandler transactionHandler = new TransactionHandler();
             return transactionHandler.processTransaction(transactionType, sourceAccount, destinationAccount, amountDouble);
-
+            
         } catch (Exception ex) {
             return new Response("Unexpected error", Status.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     public static Response getTransactions() {
         try {
             TransactionStorage storage = TransactionStorage.getInstance();
             ArrayList<Transaction> transactions = storage.getAllTransactions();
-
+            
             if (transactions.isEmpty()) {
                 return new Response("No transactions found", Status.NOT_FOUND);
             }
-
+            
             return new Response("Got all transactions", Status.OK, transactions);
         } catch (Exception ex) {
             return new Response("Unexpected error while fetching transactions", Status.INTERNAL_SERVER_ERROR);

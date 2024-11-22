@@ -17,17 +17,31 @@ import java.util.Random;
  *
  * @author tilan
  */
-public class AccountController {
+public abstract class AccountController {
 
     public static Response createAccount(String userIdText, String initialBalanceText) {
         try {
-            int userId = Integer.parseInt(userIdText);
-            double initialBalance = Double.parseDouble(initialBalanceText);
-
-            if (initialBalance < 0) {
-                return new Response("Initial balance must be non-negative", Status.BAD_REQUEST);
+            int userId;
+            double initialBalance;
+            
+            try {
+                userId = Integer.parseInt(userIdText);
+                if (userId < 0) {
+                    return new Response("User ID must be non-negative", Status.BAD_REQUEST);
+                }
+            } catch (NumberFormatException e) {
+                return new Response("User ID must be numeric", Status.BAD_REQUEST);
             }
-
+            
+            try {
+                initialBalance = Double.parseDouble(initialBalanceText);
+                if (initialBalance < 0) {
+                    return new Response("Initial balance must be non-negative", Status.BAD_REQUEST);
+                }
+            } catch (NumberFormatException e) {
+                return new Response("Balance must be numeric", Status.BAD_REQUEST);
+            }
+            
             User selectedUser = UserStorage.getInstance().getUser(userId);
 
             if (selectedUser == null) {
@@ -41,15 +55,13 @@ public class AccountController {
 
             String accountId = String.format("%03d", first) + "-" + String.format("%06d", second) + "-" + String.format("%02d", third);
             System.out.println(accountId);
-
+            
             Account account = new Account(accountId, selectedUser, initialBalance);
-
+            
             AccountStorage.getInstance().addAccount(account);
-
+            
             return new Response("Account created successfully", Status.CREATED);
-
-        } catch (NumberFormatException ex) {
-            return new Response("Invalid input format for user ID or balance", Status.BAD_REQUEST);
+            
         } catch (Exception ex) {
             return new Response("Unexpected error occurred", Status.INTERNAL_SERVER_ERROR);
         }
@@ -63,7 +75,7 @@ public class AccountController {
             if (accounts.isEmpty()) {
                 return new Response("No accounts found", Status.NOT_FOUND);
             }
-            
+
             return new Response("Got all accounts", Status.OK, accounts);
         } catch (Exception ex) {
             return new Response("Unexpected error while fetching accounts", Status.INTERNAL_SERVER_ERROR);
